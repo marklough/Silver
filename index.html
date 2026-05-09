@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Silver Collection Melt & Dealer Offer Calculator</title>
+	<style>
+		:root {
+			--bg: #eef2f7;
+			--card: #fff;
+			--ink: #111827;
+			--muted: #5f6b7a;
+			--line: #cbd5e1;
+			--accent: #1d4ed8;
+			--soft: #eaf2ff;
+			--good: #0f766e;
+			--shadow: 0 8px 24px rgba(15, 23, 42, .08);
+			--label-color: #263244;
+			--input-bg: #fff;
+			--input-color: #111827;
+			--input-border: #aebacc;
+			--readonly-bg: #eef2f7;
+			--readonly-color: #0f172a;
+			--result-bg: #f8fafc;
+			--table-last-bg: #f8fafc;
+			--table-head-bg: #f1f5f9;
+			--table-head-color: #475569;
+			--bk-bg: #f8fafc;
+			--bk-blue-bg: #eaf2ff;
+			--bk-teal-bg: #f0fdfa;
+			--bk-amber-bg: #fffbeb;
+			--bk-violet-bg: #f5f3ff;
+			--bk-rose-bg: #fff1f2
+		}
+
+		[data-theme="dark"] {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--ink: #f1f5f9;
+			--muted: #94a3b8;
+			--line: #334155;
+			--accent: #60a5fa;
+			--soft: #1e3a5f;
+			--good: #2dd4bf;
+			--shadow: 0 8px 24px rgba(0, 0, 0, .4);
+			--label-color: #cbd5e1;
+			--input-bg: #0f172a;
+			--input-color: #f1f5f9;
+			--input-border: #475569;
+			--readonly-bg: #1e293b;
+			--readonly-color: #cbd5e1;
+			--result-bg: #0f172a;
+			--table-last-bg: #1e293b;
+			--table-head-bg: #0f172a;
+			--table-head-color: #94a3b8;
+			--bk-bg: #1e293b;
+			--bk-blue-bg: #1e3a5f;
+			--bk-teal-bg: #0f2d2a;
+			--bk-amber-bg: #2d2000;
+			--bk-violet-bg: #1e1a3a;
+			--bk-rose-bg: #2d1a1e
+		}
+
+		* {
+			box-sizing: border-box
+		}
+
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--ink);
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+			font-size: 19px;
+			line-height: 1.35;
+			transition: background .2s, color .2s
+		}
+
+		.wrap {
+			max-width: 1180px;
+			margin: 0 auto;
+			padding: 22px
+		}
+
+		h1 {
+			font-size: 34px;
+			line-height: 1.08;
+			margin: 0 0 8px;
+			letter-spacing: -.02em
+		}
+
+		h2 {
+			font-size: 24px;
+			margin: 0 0 14px;
+			letter-spacing: -.01em
+		}
+
+		.note {
+			color: var(--muted);
+			line-height: 1.45;
+			margin: 0 0 18px;
+			max-width: 980px
+		}
+
+		.card {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 20px;
+			padding: 20px;
+			margin: 18px 0;
+			box-shadow: var(--shadow);
+			transition: background .2s, border-color .2s
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(12, 1fr);
+			gap: 16px;
+			align-items: stretch
+		}
+
+		.span-2 {
+			grid-column: span 2
+		}
+
+		.span-3 {
+			grid-column: span 3
+		}
+
+		.span-4 {
+			grid-column: span 4
+		}
+
+		.span-6 {
+			grid-column: span 6
+		}
+
+		.span-12 {
+			grid-column: span 12
+		}
+
+		label {
+			display: block;
+			font-weight: 900;
+			margin-bottom: 8px;
+			font-size: 16px;
+			color: var(--label-color)
+		}
+
+		input {
+			width: 100%;
+			padding: 15px 14px;
+			border: 1.5px solid var(--input-border);
+			border-radius: 12px;
+			font-size: 22px;
+			background: var(--input-bg);
+			color: var(--input-color);
+			font-weight: 800;
+			transition: background .2s, border-color .2s, color .2s
+		}
+
+		input:focus {
+			outline: 3px solid rgba(96, 165, 250, .25);
+			border-color: var(--accent)
+		}
+
+		input[readonly] {
+			background: var(--readonly-bg);
+			color: var(--readonly-color);
+			border-color: var(--line)
+		}
+
+		.help {
+			font-size: 14px;
+			color: var(--muted);
+			margin-top: 8px;
+			line-height: 1.3
+		}
+
+		.result {
+			padding: 16px;
+			background: var(--result-bg);
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			min-height: 118px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center
+		}
+
+		.result .label {
+			font-size: 14px;
+			color: var(--muted);
+			font-weight: 900;
+			margin-bottom: 7px;
+			text-transform: uppercase;
+			letter-spacing: .03em
+		}
+
+		.result .value {
+			font-size: 28px;
+			font-weight: 950;
+			letter-spacing: -.01em
+		}
+
+		.big {
+			background: var(--soft);
+			border-color: var(--accent)
+		}
+
+		.big .value {
+			color: var(--accent);
+			font-size: 36px
+		}
+
+		.summary {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 14px;
+			margin-bottom: 12px
+		}
+
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 12px;
+			font-size: 17px;
+			min-width: 900px
+		}
+
+		.table th,
+		.table td {
+			border-bottom: 1px solid var(--line);
+			padding: 13px 12px;
+			text-align: right;
+			white-space: nowrap
+		}
+
+		.table tr:last-child td {
+			background: var(--table-last-bg);
+			font-size: 18px
+		}
+
+		.table th:first-child,
+		.table td:first-child {
+			text-align: left
+		}
+
+		.table th {
+			font-size: 14px;
+			color: var(--table-head-color);
+			background: var(--table-head-bg);
+			text-transform: uppercase;
+			letter-spacing: .03em
+		}
+
+		.actions {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-top: 16px
+		}
+
+		button {
+			appearance: none;
+			border: 0;
+			border-radius: 14px;
+			padding: 15px 20px;
+			font-size: 18px;
+			font-weight: 950;
+			background: var(--accent);
+			color: #fff;
+			cursor: pointer;
+			box-shadow: 0 4px 14px rgba(29, 78, 216, .25)
+		}
+
+		.secondary {
+			background: #475569;
+			box-shadow: none
+		}
+
+		.pill {
+			display: inline-block;
+			background: var(--soft);
+			color: var(--accent);
+			border-radius: 999px;
+			padding: 8px 12px;
+			font-size: 14px;
+			font-weight: 900;
+			margin-top: 12px
+		}
+
+		/* dark mode toggle */
+		.header-row {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 16px;
+			flex-wrap: wrap;
+			margin-bottom: 4px
+		}
+
+		.dark-toggle {
+			appearance: none;
+			border: 2px solid var(--line);
+			border-radius: 999px;
+			padding: 8px 16px;
+			font-size: 15px;
+			font-weight: 900;
+			background: var(--card);
+			color: var(--ink);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 7px;
+			white-space: nowrap;
+			transition: background .2s, border-color .2s, color .2s;
+			flex-shrink: 0;
+			margin-top: 4px
+		}
+
+		.dark-toggle:hover {
+			border-color: var(--accent);
+			color: var(--accent)
+		}
+
+		@media(max-width:980px) {
+
+			.span-2,
+			.span-3,
+			.span-4,
+			.span-6 {
+				grid-column: span 12
+			}
+
+			.summary {
+				grid-template-columns: 1fr 1fr
+			}
+
+			.wrap {
+				padding: 14px
+			}
+
+			h1 {
+				font-size: 28px
+			}
+
+			.result .value {
+				font-size: 26px
+			}
+		}
+
+		@media(max-width:620px) {
+			.summary {
+				grid-template-columns: 1fr
+			}
+
+			body {
+				font-size: 18px
+			}
+
+			input {
+				font-size: 21px
+			}
+
+			.card {
+				padding: 16px;
+				border-radius: 18px
+			}
+		}
+
+		/* ── Breakdown Summary Panel ── */
+		.breakdown {
+			margin-top: 18px
+		}
+
+		.breakdown-title {
+			font-size: 15px;
+			font-weight: 900;
+			text-transform: uppercase;
+			letter-spacing: .06em;
+			color: #475569;
+			margin: 0 0 12px
+		}
+
+		.bk-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px
+		}
+
+		.bk-card {
+			background: var(--bk-bg);
+			border: 1.5px solid var(--line);
+			border-radius: 16px;
+			padding: 16px 18px;
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			transition: box-shadow .15s, background .2s, border-color .2s
+		}
+
+		.bk-card:hover {
+			box-shadow: 0 4px 16px rgba(15, 23, 42, .10)
+		}
+
+		.bk-card.accent-blue {
+			background: var(--bk-blue-bg);
+			border-color: #93c5fd
+		}
+
+		.bk-card.accent-teal {
+			background: var(--bk-teal-bg);
+			border-color: #5eead4
+		}
+
+		.bk-card.accent-amber {
+			background: var(--bk-amber-bg);
+			border-color: #fcd34d
+		}
+
+		.bk-card.accent-violet {
+			background: var(--bk-violet-bg);
+			border-color: #c4b5fd
+		}
+
+		.bk-card.accent-rose {
+			background: var(--bk-rose-bg);
+			border-color: #fda4af
+		}
+
+		.bk-card.accent-final {
+			background: linear-gradient(135deg, #1d4ed8 0%, #0f766e 100%);
+			border-color: transparent;
+			color: #fff
+		}
+
+		.bk-name {
+			font-size: 13px;
+			font-weight: 900;
+			text-transform: uppercase;
+			letter-spacing: .05em;
+			opacity: .65
+		}
+
+		.bk-card.accent-final .bk-name {
+			opacity: .75;
+			color: #fff
+		}
+
+		.bk-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			gap: 8px;
+			flex-wrap: wrap
+		}
+
+		.bk-metric {
+			font-size: 13px;
+			color: var(--muted);
+			font-weight: 700;
+			white-space: nowrap
+		}
+
+		.bk-card.accent-final .bk-metric {
+			color: rgba(255, 255, 255, .75)
+		}
+
+		.bk-val {
+			font-size: 18px;
+			font-weight: 950;
+			color: var(--ink);
+			letter-spacing: -.01em
+		}
+
+		.bk-card.accent-final .bk-val {
+			color: #fff;
+			font-size: 22px
+		}
+
+		.bk-divider {
+			border: none;
+			border-top: 1px solid var(--line);
+			margin: 4px 0
+		}
+
+		.bk-card.accent-final .bk-divider {
+			border-color: rgba(255, 255, 255, .25)
+		}
+
+		@media(max-width:900px) {
+			.bk-grid {
+				grid-template-columns: 1fr 1fr
+			}
+		}
+
+		@media(max-width:540px) {
+			.bk-grid {
+				grid-template-columns: 1fr
+			}
+		}
+
+		.print-report {
+			display: none
+		}
+
+		@media print {
+			@page {
+				size: letter portrait;
+				margin: 0.45in
+			}
+
+			body {
+				background: #fff;
+				color: #111827;
+				font-size: 12.5pt;
+				line-height: 1.25;
+				-webkit-print-color-adjust: exact;
+				print-color-adjust: exact
+			}
+
+			.wrap {
+				max-width: none;
+				padding: 0
+			}
+
+			.actions,
+			button,
+			.note,
+			.card {
+				display: none !important
+			}
+
+			h1 {
+				font-size: 20pt;
+				margin: 0 0 6pt
+			}
+
+			h2 {
+				font-size: 15pt;
+				margin: 0 0 8pt
+			}
+
+			.print-report {
+				display: block !important
+			}
+
+			.print-title {
+				border-bottom: 2px solid #111827;
+				padding-bottom: 8pt;
+				margin-bottom: 12pt
+			}
+
+			.print-meta {
+				font-size: 10.5pt;
+				color: #475569;
+				margin-top: 4pt
+			}
+
+			.print-grid {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 8pt;
+				margin: 10pt 0 12pt
+			}
+
+			.print-box {
+				border: 1.25px solid #94a3b8;
+				border-radius: 8pt;
+				padding: 8pt;
+				background: #f8fafc;
+				break-inside: avoid
+			}
+
+			.print-box .k {
+				font-size: 9pt;
+				text-transform: uppercase;
+				letter-spacing: .04em;
+				color: #475569;
+				font-weight: 800;
+				margin-bottom: 4pt
+			}
+
+			.print-box .v {
+				font-size: 15pt;
+				font-weight: 900;
+				color: #0f172a
+			}
+
+			.print-box.final {
+				background: #eaf2ff;
+				border-color: #2563eb
+			}
+
+			.print-box.final .v {
+				font-size: 18pt;
+				color: #1d4ed8
+			}
+
+			.print-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-top: 8pt;
+				font-size: 10.5pt;
+				page-break-inside: auto
+			}
+
+			.print-table th {
+				background: #e2e8f0;
+				color: #0f172a;
+				font-weight: 900;
+				text-transform: uppercase;
+				font-size: 8.5pt;
+				letter-spacing: .03em;
+				border: 1px solid #94a3b8;
+				padding: 6pt 5pt;
+				text-align: right
+			}
+
+			.print-table td {
+				border: 1px solid #cbd5e1;
+				padding: 6pt 5pt;
+				text-align: right;
+				vertical-align: top
+			}
+
+			.print-table th:first-child,
+			.print-table td:first-child {
+				text-align: left
+			}
+
+			.print-table .total-row td {
+				background: #f1f5f9;
+				font-weight: 900;
+				font-size: 11.5pt
+			}
+
+			.print-notes {
+				margin-top: 10pt;
+				border-top: 1px solid #cbd5e1;
+				padding-top: 8pt;
+				font-size: 10pt;
+				color: #334155
+			}
+
+			.print-notes div {
+				margin-bottom: 3pt
+			}
+
+			/* High-contrast readable PDF export colors */
+			.print-title,
+			.print-meta,
+			.print-report,
+			.print-report * {
+				color: #000 !important;
+			}
+
+			.print-box,
+			.print-box.final {
+				background: #ffffff !important;
+				border: 1.5px solid #000000 !important;
+				color: #000000 !important;
+			}
+
+			.print-box .k,
+			.print-box .v,
+			.print-box.final .v {
+				color: #000000 !important;
+			}
+
+			.print-table th {
+				background: #d9d9d9 !important;
+				color: #000000 !important;
+				border: 1px solid #000000 !important;
+			}
+
+			.print-table td {
+				background: #ffffff !important;
+				color: #000000 !important;
+				border: 1px solid #000000 !important;
+			}
+
+			.print-table .total-row td {
+				background: #eeeeee !important;
+				color: #000000 !important;
+			}
+
+			.print-notes {
+				color: #000000 !important;
+				border-top: 1px solid #000000 !important;
+			}
+		}
+
+		@media screen {
+			.print-report {
+				display: none !important
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="header-row">
+			<h1>Silver Collection Melt & Dealer Offer Calculator</h1>
+			<button class="dark-toggle" id="darkToggle" onclick="toggleDark()"><span id="darkIcon">🌙</span><span id="darkLabel">Dark Mode</span></button>
+		</div>
+		<p class="note">Defaults are populated from the inventory PDF. The collection face-value totals are editable. Dealer payout per $1 FV can be edited directly or derived from the buyback rate; Sterling payout is also editable and linked to Sterling buyback rate.</p>
+
+		<div class="card">
+			<h2>1) Collection Face Values & Spot</h2>
+			<div class="grid">
+				<div class="span-3"><label for="spot">Silver Spot Price ($/oz)</label><input id="spot" type="number" step="0.01" value="80.00">
+					<div class="actions" style="margin-top:10px"><button type="button" onclick="fetchLiveSpot()">Fetch Live Spot</button></div>
+					<div class="help" id="spotStatus">Manual spot only. Default is $80.00. Tap Fetch Live Spot to update.</div>
+				</div>
+				<div class="span-3"><label for="fv90">Total 90% Face Value ($)</label><input id="fv90" type="number" step="0.01" value="100.00">
+					<div class="help">Populated from inventory PDF. Editable during use.</div>
+				</div>
+				<div class="span-3"><label for="fv40">Total 40% Face Value ($)</label><input id="fv40" type="number" step="0.01" value="25.00">
+					<div class="help">Populated from inventory PDF. Editable during use.</div>
+				</div>
+				<div class="span-3"><label for="numismatic">Added Numismatic Value ($)</label><input id="numismatic" type="number" step="0.01" value="0.00">
+					<div class="help">Extra dollars above melt for separated coins.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<h2>2) Buyback Rates & Dealer Payout per $1 Face</h2>
+			<div class="grid">
+				<div class="span-3"><label for="rate90">90% Buyback Rate (%)</label><input id="rate90" type="number" step="0.1" value="82.5">
+					<div class="help">Fair dealer offer default: 90%.</div>
+				</div>
+				<div class="span-3"><label for="buyPerFv90">90% Dealer Payout per $1 FV</label><input id="buyPerFv90" type="number" step="0.01">
+					<div class="help">Editable. Updates buyback rate from spot, or updates from buyback rate.</div>
+				</div>
+				<div class="span-3 result">
+					<div class="label">90% Silver Content</div>
+					<div class="value" id="oz90">0.00 oz</div>
+				</div>
+
+				<div class="span-3"><label for="rate40">40% Buyback Rate (%)</label><input id="rate40" type="number" step="0.1" value="81.5">
+					<div class="help">Fair dealer offer default: 85%.</div>
+				</div>
+				<div class="span-3"><label for="buyPerFv40">40% Dealer Payout per $1 FV</label><input id="buyPerFv40" type="number" step="0.01">
+					<div class="help">Editable. Updates buyback rate from spot, or updates from buyback rate.</div>
+				</div>
+				<div class="span-3 result">
+					<div class="label">40% Silver Content</div>
+					<div class="value" id="oz40">0.00 oz</div>
+				</div>
+			</div>
+			<div class="pill">Worn/circulated silver factors: 90% = 0.715 oz per $1 FV; 40% = 0.295 oz per $1 FV</div>
+		</div>
+
+		<div class="card">
+			<h2>3) Sterling Medals</h2>
+			<div class="grid">
+				<div class="span-4"><label for="sterlingSilverOz">Sterling ASW (Actual Silver Weight, oz)</label><input id="sterlingSilverOz" type="number" step="0.01" value="0.00">
+					<div class="help">Pure silver weight (ASW). Already adjusted for 92.5% sterling.</div>
+				</div>
+				<div class="span-4"><label for="rateSterling">Sterling Buyback Rate (%)</label><input id="rateSterling" type="number" step="0.1" value="70">
+					<div class="help">Fair dealer offer default: 75%.</div>
+				</div>
+				<div class="span-4"><label for="sterlingPayout">Sterling ASW Dealer Payout</label><input id="sterlingPayout" type="number" step="0.01">
+					<div class="help">Editable. Updates Sterling buyback rate from spot and ASW, or updates from buyback rate.</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card">
+			<h2>4) Summary</h2>
+			<div class="summary">
+				<div class="result">
+					<div class="label">90% Dealer Payout</div>
+					<div class="value" id="payout90">$0.00</div>
+				</div>
+				<div class="result">
+					<div class="label">40% Dealer Payout</div>
+					<div class="value" id="payout40">$0.00</div>
+				</div>
+				<div class="result">
+					<div class="label">Total Silver Content</div>
+					<div class="value" id="sumOz">0.00 oz</div>
+				</div>
+				<div class="result big">
+					<div class="label">Final Total Offer</div>
+					<div class="value" id="finalTotal">$0.00</div>
+				</div>
+			</div>
+			<!-- Breakdown Summary -->
+			<div class="breakdown">
+				<div class="breakdown-title">Breakdown at a Glance</div>
+				<div class="bk-grid">
+
+					<!-- 90% Coins -->
+					<div class="bk-card accent-blue">
+						<div class="bk-name">90% Silver Coins</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Face Value</span><span class="bk-val" id="bk-fv90">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Silver Content</span><span class="bk-val" id="bk-oz90">0.00 oz</span></div>
+						<div class="bk-row"><span class="bk-metric">$1 FV Offer</span><span class="bk-val" id="bk-per90">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Buyback Rate</span><span class="bk-val" id="bk-rate90">0%</span></div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Dealer Payout</span><span class="bk-val" id="bk-pay90">$0.00</span></div>
+					</div>
+
+					<!-- 40% Coins -->
+					<div class="bk-card accent-violet">
+						<div class="bk-name">40% Kennedy Halves</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Face Value</span><span class="bk-val" id="bk-fv40">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Silver Content</span><span class="bk-val" id="bk-oz40">0.00 oz</span></div>
+						<div class="bk-row"><span class="bk-metric">$1 FV Offer</span><span class="bk-val" id="bk-per40">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Buyback Rate</span><span class="bk-val" id="bk-rate40">0%</span></div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Dealer Payout</span><span class="bk-val" id="bk-pay40">$0.00</span></div>
+					</div>
+
+					<!-- Sterling -->
+					<div class="bk-card accent-teal">
+						<div class="bk-name">Sterling (ASW)</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">ASW</span><span class="bk-val" id="bk-ozSt">0.00 oz</span></div>
+						<div class="bk-row"><span class="bk-metric">Melt Value</span><span class="bk-val" id="bk-meltSt">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Buyback Rate</span><span class="bk-val" id="bk-rateSt">0%</span></div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Dealer Payout</span><span class="bk-val" id="bk-paySt">$0.00</span></div>
+					</div>
+
+					<!-- Numismatic -->
+					<div class="bk-card accent-amber">
+						<div class="bk-name">Numismatic Add-on</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Adjusted Value</span><span class="bk-val" id="bk-numismatic">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Above melt</span><span class="bk-metric" style="font-style:italic">manual entry</span></div>
+					</div>
+
+					<!-- Total Silver -->
+					<div class="bk-card accent-rose">
+						<div class="bk-name">Total Silver</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">90% Content</span><span class="bk-val" id="bk-total90oz">0.00 oz</span></div>
+						<div class="bk-row"><span class="bk-metric">40% Content</span><span class="bk-val" id="bk-total40oz">0.00 oz</span></div>
+						<div class="bk-row"><span class="bk-metric">Sterling ASW</span><span class="bk-val" id="bk-totalStoz">0.00 oz</span></div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">Combined</span><span class="bk-val" id="bk-totalOz">0.00 oz</span></div>
+					</div>
+
+					<!-- Final -->
+					<div class="bk-card accent-final">
+						<div class="bk-name">Final Offer</div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric">90% Coins</span><span class="bk-val" id="bk-f90">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">40% Halves</span><span class="bk-val" id="bk-f40">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Sterling</span><span class="bk-val" id="bk-fSt">$0.00</span></div>
+						<div class="bk-row"><span class="bk-metric">Numismatic</span><span class="bk-val" id="bk-fNum">$0.00</span></div>
+						<hr class="bk-divider">
+						<div class="bk-row"><span class="bk-metric" style="font-size:15px;opacity:1;font-weight:950">TOTAL</span><span class="bk-val" id="bk-final">$0.00</span></div>
+					</div>
+
+				</div>
+			</div>
+			<div class="actions"><button onclick="window.print()">Export / Print PDF</button><button class="secondary" onclick="resetDefaults()">Reset PDF Defaults</button></div>
+		</div>
+
+		<section class="print-report" id="printReport" aria-label="Printable dealer offer summary">
+			<div class="print-title">
+				<h1>Silver Collection Dealer Offer Summary</h1>
+				<div class="print-meta">Printable summary generated from editable calculator inputs. Inventory defaults came from the uploaded inventory PDF. Spot is manual only and editable.</div>
+			</div>
+			<div class="print-grid">
+				<div class="print-box">
+					<div class="k">Silver Spot Price</div>
+					<div class="v" id="prSpot">$0.00</div>
+				</div>
+				<div class="print-box">
+					<div class="k">90% Face Value</div>
+					<div class="v" id="prFv90">$0.00</div>
+				</div>
+				<div class="print-box">
+					<div class="k">40% Face Value</div>
+					<div class="v" id="prFv40">$0.00</div>
+				</div>
+				<div class="print-box final">
+					<div class="k">Final Total Offer</div>
+					<div class="v" id="prFinal">$0.00</div>
+				</div>
+			</div>
+			<h2>Itemized Melt & Dealer Payout</h2>
+			<table class="print-table">
+				<thead>
+					<tr>
+						<th>Category</th>
+						<th>Editable Input</th>
+						<th>Silver Content</th>
+						<th>Melt Value</th>
+						<th>Buyback Rate</th>
+						<th>$1 FV Dealer Payout</th>
+						<th>Dealer Payout</th>
+					</tr>
+				</thead>
+				<tbody id="printTbody"></tbody>
+			</table>
+			<div class="print-grid">
+				<div class="print-box">
+					<div class="k">90% Silver</div>
+					<div class="v" id="prOz90">0.00 oz</div>
+				</div>
+				<div class="print-box">
+					<div class="k">40% Silver</div>
+					<div class="v" id="prOz40">0.00 oz</div>
+				</div>
+				<div class="print-box">
+					<div class="k">Sterling ASW</div>
+					<div class="v" id="prOzSt">0.00 oz</div>
+				</div>
+				<div class="print-box">
+					<div class="k">Total Silver Content</div>
+					<div class="v" id="prOzTotal">0.00 oz</div>
+				</div>
+			</div>
+			<div class="print-notes">
+				<div><strong>Silver factors used:</strong> 90% circulated coins = 0.715 oz per $1 FV; 40% Kennedy halves = 0.295 oz per $1 FV.</div>
+				<div><strong>Sterling ASW:</strong> Actual Silver Weight means pure silver content after the 92.5% sterling adjustment.</div>
+				<div><strong>Numismatic added value:</strong> shown as a separate manual add-on above melt/dealer payout.</div>
+			</div>
+		</section>
+	</div>
+	<script>
+		const FV90_OZ = 0.715; // worn/circulated 90% silver per $1 FV
+		const FV40_OZ = 0.295; // worn/circulated 40% halves per $1 FV
+		const DEFAULTS = { spot: 80, numismatic: 0, fv90: 100, rate90: 82.5, fv40: 25, rate40: 81.5, sterlingSilverOz: 0, rateSterling: 75 };
+		const $ = id => document.getElementById(id);
+		const val = id => parseFloat(String($(id).value).replace(/[$,]/g, '')) || 0;
+		const money = n => (isFinite(n) ? n : 0).toLocaleString(undefined, { style: 'currency', currency: 'USD' });
+		const num = (n, d = 2) => (isFinite(n) ? n : 0).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+		let editingPayout = null;
+		let editingSterlingPayout = false;
+		let syncing = false;
+
+		function setVal(id, value, digits = 2) { $(id).value = isFinite(value) ? Number(value).toFixed(digits) : (0).toFixed(digits); }
+
+		function syncLinkedFields() {
+			if (syncing) return;
+			syncing = true;
+			const spot = val('spot');
+			if (editingPayout === '90') {
+				const denom = FV90_OZ * spot;
+				setVal('rate90', denom > 0 ? (val('buyPerFv90') / denom) * 100 : 0, 1);
+			} else {
+				setVal('buyPerFv90', FV90_OZ * spot * (val('rate90') / 100), 2);
+			}
+			if (editingPayout === '40') {
+				const denom = FV40_OZ * spot;
+				setVal('rate40', denom > 0 ? (val('buyPerFv40') / denom) * 100 : 0, 1);
+			} else {
+				setVal('buyPerFv40', FV40_OZ * spot * (val('rate40') / 100), 2);
+			}
+			const sterlingDenom = val('sterlingSilverOz') * spot;
+			if (editingSterlingPayout) {
+				setVal('rateSterling', sterlingDenom > 0 ? (val('sterlingPayout') / sterlingDenom) * 100 : 0, 1);
+			} else {
+				setVal('sterlingPayout', sterlingDenom * (val('rateSterling') / 100), 2);
+			}
+			syncing = false;
+		}
+
+		function calc() {
+			syncLinkedFields();
+			const spot = val('spot'),
+				add = val('numismatic'),
+				fv90 = val('fv90'),
+				fv40 = val('fv40'),
+				r90 = val('rate90') / 100,
+				r40 = val('rate40') / 100,
+				stOz = val('sterlingSilverOz'),
+				rSt = val('rateSterling') / 100;
+			const oz90 = fv90 * FV90_OZ,
+				oz40 = fv40 * FV40_OZ,
+				melt90 = oz90 * spot,
+				melt40 = oz40 * spot,
+				meltSt = stOz * spot;
+			const per90 = val('buyPerFv90'),
+				per40 = val('buyPerFv40');
+			const pay90 = fv90 * per90,
+				pay40 = fv40 * per40,
+				paySt = meltSt * rSt,
+				final = pay90 + pay40 + paySt + add,
+				totalOz = oz90 + oz40 + stOz;
+			$('oz90').textContent = num(oz90, 2) + ' oz';
+			$('oz40').textContent = num(oz40, 2) + ' oz';
+			$('payout90').textContent = money(pay90);
+			$('payout40').textContent = money(pay40);
+			$('sumOz').textContent = num(totalOz, 2) + ' oz';
+			$('finalTotal').textContent = money(final);
+			// Breakdown summary cards
+			$('bk-fv90').textContent = money(fv90);
+			$('bk-oz90').textContent = num(oz90, 2) + ' oz';
+			$('bk-per90').textContent = money(per90);
+			$('bk-rate90').textContent = num(r90 * 100, 1) + '%';
+			$('bk-pay90').textContent = money(pay90);
+			$('bk-fv40').textContent = money(fv40);
+			$('bk-oz40').textContent = num(oz40, 2) + ' oz';
+			$('bk-per40').textContent = money(per40);
+			$('bk-rate40').textContent = num(r40 * 100, 1) + '%';
+			$('bk-pay40').textContent = money(pay40);
+			$('bk-ozSt').textContent = num(stOz, 2) + ' oz';
+			$('bk-meltSt').textContent = money(meltSt);
+			$('bk-rateSt').textContent = num(rSt * 100, 1) + '%';
+			$('bk-paySt').textContent = money(paySt);
+			$('bk-numismatic').textContent = money(add);
+			$('bk-total90oz').textContent = num(oz90, 2) + ' oz';
+			$('bk-total40oz').textContent = num(oz40, 2) + ' oz';
+			$('bk-totalStoz').textContent = num(stOz, 2) + ' oz';
+			$('bk-totalOz').textContent = num(totalOz, 2) + ' oz';
+			$('bk-f90').textContent = money(pay90);
+			$('bk-f40').textContent = money(pay40);
+			$('bk-fSt').textContent = money(paySt);
+			$('bk-fNum').textContent = money(add);
+			$('bk-final').textContent = money(final);
+			if ($('tbody')) $('tbody').innerHTML = `
+    <tr><td>90% silver coins</td><td>${money(fv90)} FV</td><td>${num(oz90,2)} oz</td><td>${money(melt90)}</td><td>${num(r90*100,1)}%</td><td>${money(per90)}</td><td>${money(pay90)}</td></tr>
+    <tr><td>40% Kennedy halves</td><td>${money(fv40)} FV</td><td>${num(oz40,2)} oz</td><td>${money(melt40)}</td><td>${num(r40*100,1)}%</td><td>${money(per40)}</td><td>${money(pay40)}</td></tr>
+    <tr><td>Sterling medals (ASW)</td><td>${num(stOz,2)} oz ASW</td><td>${num(stOz,2)} oz ASW</td><td>${money(meltSt)}</td><td>${num(rSt*100,1)}%</td><td>—</td><td>${money(paySt)}</td></tr>
+    <tr><td>Added numismatic value</td><td>Manual add-on</td><td>—</td><td>—</td><td>—</td><td>—</td><td>${money(add)}</td></tr>
+    <tr><td><strong>Final total offer</strong></td><td colspan="5"></td><td><strong>${money(final)}</strong></td></tr>`;
+			$('prSpot').textContent = money(spot);
+			$('prFv90').textContent = money(fv90);
+			$('prFv40').textContent = money(fv40);
+			$('prFinal').textContent = money(final);
+			$('prOz90').textContent = num(oz90, 2) + ' oz';
+			$('prOz40').textContent = num(oz40, 2) + ' oz';
+			$('prOzSt').textContent = num(stOz, 2) + ' oz';
+			$('prOzTotal').textContent = num(totalOz, 2) + ' oz';
+			$('printTbody').innerHTML = `
+    <tr><td>90% silver coins</td><td>${money(fv90)} FV</td><td>${num(oz90,2)} oz</td><td>${money(melt90)}</td><td>${num(r90*100,1)}%</td><td>${money(per90)}</td><td>${money(pay90)}</td></tr>
+    <tr><td>40% Kennedy halves</td><td>${money(fv40)} FV</td><td>${num(oz40,2)} oz</td><td>${money(melt40)}</td><td>${num(r40*100,1)}%</td><td>${money(per40)}</td><td>${money(pay40)}</td></tr>
+    <tr><td>Sterling medals (ASW)</td><td>${num(stOz,2)} oz ASW</td><td>${num(stOz,2)} oz ASW</td><td>${money(meltSt)}</td><td>${num(rSt*100,1)}%</td><td>—</td><td>${money(paySt)}</td></tr>
+    <tr><td>Added numismatic value</td><td>Manual add-on</td><td>—</td><td>—</td><td>—</td><td>—</td><td>${money(add)}</td></tr>
+    <tr class="total-row"><td>Final total offer</td><td colspan="5"></td><td>${money(final)}</td></tr>`;
+		}
+
+
+		async function fetchLiveSpot() {
+			const status = $('spotStatus');
+			status.textContent = 'Fetching live silver spot...';
+			try {
+				// Metals.live provides a simple public JSON endpoint. It may be blocked by some browsers/CORS settings.
+				const response = await fetch('https://api.metals.live/v1/spot/silver', { cache: 'no-store' });
+				if (!response.ok) throw new Error('Network response was not OK');
+				const data = await response.json();
+				let spotValue = null;
+
+				// Expected shape is usually: [{ silver: 80.12 }], but handle a few common variants.
+				if (Array.isArray(data)) {
+					for (const item of data) {
+						if (item && typeof item.silver === 'number') spotValue = item.silver;
+						if (item && typeof item.price === 'number') spotValue = item.price;
+					}
+				} else if (data && typeof data === 'object') {
+					if (typeof data.silver === 'number') spotValue = data.silver;
+					if (typeof data.price === 'number') spotValue = data.price;
+					if (data.rates && typeof data.rates.XAG === 'number') spotValue = data.rates.XAG;
+				}
+
+				if (!spotValue || !isFinite(spotValue)) throw new Error('Silver price not found in response');
+				setVal('spot', spotValue, 2);
+				editingPayout = null;
+				editingSterlingPayout = false;
+				calc();
+				status.textContent = 'Live spot updated: ' + money(spotValue) + ' per oz. You can still edit it manually.';
+			} catch (err) {
+				status.textContent = 'Live fetch failed. Enter the spot price manually, or try again later.';
+				console.error(err);
+			}
+		}
+
+		function resetDefaults() {
+			Object.entries(DEFAULTS).forEach(([k, v]) => { setVal(k, v, k.includes('rate') ? 1 : 2) });
+			$('spotStatus').textContent = 'Manual spot only. Reset to default spot of $80.00. Tap Fetch Live Spot to update.';
+			editingPayout = null;
+			editingSterlingPayout = false;
+			calc();
+		}
+		['buyPerFv90', 'buyPerFv40'].forEach(id => {
+			$(id).addEventListener('input', () => { editingPayout = id === 'buyPerFv90' ? '90' : '40';
+				calc(); });
+			$(id).addEventListener('blur', () => { setVal(id, val(id), 2); });
+		});
+		['rate90', 'rate40', 'spot'].forEach(id => $(id).addEventListener('input', () => { editingPayout = null;
+			editingSterlingPayout = false;
+			calc(); }));
+		['fv90', 'fv40', 'numismatic'].forEach(id => $(id).addEventListener('input', calc));
+		['sterlingSilverOz', 'rateSterling'].forEach(id => $(id).addEventListener('input', () => { editingSterlingPayout = false; calc(); }));
+		$('sterlingPayout').addEventListener('input', () => { editingSterlingPayout = true; calc(); });
+		$('sterlingPayout').addEventListener('blur', () => { setVal('sterlingPayout', val('sterlingPayout'), 2); });
+		// Dark mode
+		function applyTheme(dark) {
+			document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+			document.getElementById('darkIcon').textContent = dark ? '☀️' : '🌙';
+			document.getElementById('darkLabel').textContent = dark ? 'Light Mode' : 'Dark Mode';
+			localStorage.setItem('coinCalcTheme', dark ? 'dark' : 'light');
+		}
+
+		function toggleDark() {
+			applyTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+		}
+		(function() {
+			const saved = localStorage.getItem('coinCalcTheme');
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			applyTheme(saved ? saved === 'dark' : prefersDark);
+		})();
+		resetDefaults();
+	</script>
+</body>
+
+</html>
