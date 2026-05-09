@@ -713,7 +713,7 @@
 			<div class="grid">
 				<div class="span-3"><label for="spot">Silver Spot Price ($/oz)</label><input id="spot" type="number" step="0.01" value="80.00">
 					<div class="actions" style="margin-top:10px"><button type="button" onclick="fetchLiveSpot()">Fetch Live Spot</button></div>
-					<div class="help" id="spotStatus">Default is $80.00. Tap Fetch Live Spot to try live XAG/USD; manual entry always works.</div>
+					<div class="help" id="spotStatus">Default is $80.00. Fetch tries Yahoo Finance, Silver Futures, then Metals.live. Manual entry always works.</div>
 				</div>
 				<div class="span-3"><label for="fv90">Total 90% Face Value ($)</label><input id="fv90" type="number" step="0.01" value="100.00">
 					<div class="help">Populated from inventory PDF. Editable during use.</div>
@@ -869,7 +869,7 @@
 		<section class="print-report" id="printReport" aria-label="Printable dealer offer summary">
 			<div class="print-title">
 				<h1>Silver Collection Dealer Offer Summary</h1>
-				<div class="print-meta">Printable summary generated from editable calculator inputs. Inventory defaults came from the uploaded inventory PDF. Spot is editable; live fetch uses public XAG/USD sources when the browser allows it.</div>
+				<div class="print-meta">Printable summary generated from editable calculator inputs. Inventory defaults came from the uploaded inventory PDF. Spot is manual only and editable.</div>
 			</div>
 			<div class="print-grid">
 				<div class="print-box">
@@ -1044,54 +1044,61 @@
 		}
 
 
-		function extractSpotValue(data) {
-			let candidates = [];
-			function walk(obj) {
-				if (obj == null) return;
-				if (typeof obj === 'number' && isFinite(obj)) { candidates.push(obj); return; }
-				if (Array.isArray(obj)) { obj.forEach(walk); return; }
-				if (typeof obj === 'object') {
-					['price','silver','XAG','xag','ask','bid','mid','value','rate'].forEach(k => {
-						if (typeof obj[k] === 'number' && isFinite(obj[k])) candidates.push(obj[k]);
-					});
-					Object.keys(obj).forEach(k => { if (typeof obj[k] === 'object') walk(obj[k]); });
-				}
-			}
-			walk(data);
-			// Silver spot should normally be quoted in dollars per troy ounce, not fractions or huge currency ratios.
-			candidates = candidates.filter(n => n > 1 && n < 300);
-			return candidates.length ? candidates[0] : null;
-		}
-
-		async function fetchJsonWithTimeout(url, timeoutMs = 9000) {
-			const controller = new AbortController();
-			const timer = setTimeout(() => controller.abort(), timeoutMs);
-			try {
-				const response = await fetch(url, { cache: 'no-store', signal: controller.signal, mode: 'cors' });
-				if (!response.ok) throw new Error('HTTP ' + response.status);
-				return await response.json();
-			} finally {
-				clearTimeout(timer);
-			}
-		}
-
 		async function fetchLiveSpot() {
 			const status = $('spotStatus');
 			status.textContent = 'Fetching live silver spot...';
 
+			const timeoutFetch = async (url, options = {}, ms = 9000) => {
+				const controller = new AbortController();
+				const timer = setTimeout(() => controller.abort(), ms);
+				try {
+					return await fetch(url, { cache: 'no-store', mode: 'cors', ...options, signal: controller.signal });
+				} finally {
+					clearTimeout(timer);
+				}
+			};
+
 			const sources = [
-				{ name: 'Gold-API XAG', url: 'https://api.gold-api.com/price/XAG' },
-				{ name: 'Gold-API Silver alias', url: 'https://api.gold-api.com/price/SILVER' },
-				{ name: 'Metals.live', url: 'https://api.metals.live/v1/spot/silver' }
+				{
+					name: 'Yahoo Finance XAG/USD',
+					url: 'https://query1.finance.yahoo.com/v8/finance/chart/XAGUSD=X?interval=1d&range=1d',
+					parse: async r => {
+						const data = await r.json();
+						return data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+					}
+				},
+				{
+					name: 'Yahoo Finance Silver Futures',
+					url: 'https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d',
+					parse: async r => {
+						const data = await r.json();
+						return data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+					}
+				},
+				{
+					name: 'Metals.live',
+					url: 'https://api.metals.live/v1/spot/silver',
+					parse: async r => {
+						const data = await r.json();
+						if (Array.isArray(data)) {
+							for (const item of data) {
+								if (typeof item?.silver === 'number') return item.silver;
+								if (typeof item?.price === 'number') return item.price;
+							}
+						}
+						return data?.silver ?? data?.price ?? data?.rates?.XAG;
+					}
+				}
 			];
 
-			let lastError = '';
+			const errors = [];
 			for (const source of sources) {
 				try {
 					status.textContent = 'Trying ' + source.name + '...';
-					const data = await fetchJsonWithTimeout(source.url);
-					const spotValue = extractSpotValue(data);
-					if (!spotValue || !isFinite(spotValue)) throw new Error('No usable silver price in response');
+					const response = await timeoutFetch(source.url);
+					if (!response.ok) throw new Error('HTTP ' + response.status);
+					const spotValue = Number(await source.parse(response));
+					if (!spotValue || !isFinite(spotValue) || spotValue < 1) throw new Error('No usable silver price in response');
 					setVal('spot', spotValue, 2);
 					editingPayout = null;
 					editingSterlingPayout = false;
@@ -1099,17 +1106,17 @@
 					status.textContent = 'Live spot updated from ' + source.name + ': ' + money(spotValue) + ' per oz. You can still edit it manually.';
 					return;
 				} catch (err) {
-					lastError = source.name + ': ' + (err && err.message ? err.message : String(err));
+					errors.push(source.name + ': ' + (err?.message || err));
 					console.warn('Live spot source failed:', source.name, err);
 				}
 			}
 
-			status.textContent = 'Live fetch failed from all built-in sources. Your GitHub Pages page is working, but the price API may be blocked/down. Enter spot manually for now. Last error: ' + lastError;
+			status.innerHTML = 'Live fetch failed from all sources. This is usually CORS/API blocking. Enter spot manually. Details: ' + errors.join(' | ');
 		}
 
 		function resetDefaults() {
 			Object.entries(DEFAULTS).forEach(([k, v]) => { setVal(k, v, k.includes('rate') ? 1 : 2) });
-			$('spotStatus').textContent = 'Reset to default spot of $80.00. Tap Fetch Live Spot to try live XAG/USD.';
+			$('spotStatus').textContent = 'Reset to default spot of $80.00. Fetch tries Yahoo Finance, Silver Futures, then Metals.live. Manual entry always works.';
 			editingPayout = null;
 			editingSterlingPayout = false;
 			calc();
