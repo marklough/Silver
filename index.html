@@ -353,7 +353,7 @@
 		}
 
 		.summary-card {
-			min-height: 130px;
+			min-height: 170px;
 			padding: 26px 28px;
 			border-radius: 24px;
 			justify-content: center;
@@ -377,7 +377,7 @@
 
 		.final-summary-card .value {
 			color: var(--accent);
-			font-size: 44px;
+			font-size: 58px;
 		}
 
 		[data-theme="dark"] .summary-card {
@@ -413,8 +413,8 @@
 
 		@media(max-width:620px) {
 			.summary-card {
-				min-height: 126px;
-				padding: 24px 22px;
+				min-height: 170px;
+				padding: 28px 24px;
 				border-radius: 22px;
 			}
 
@@ -424,7 +424,7 @@
 
 			.summary-card .value,
 			.final-summary-card .value {
-				font-size: 38px;
+				font-size: 56px;
 			}
 		}
 
@@ -852,18 +852,6 @@
 		<div class="card">
 			<h2>4) Summary</h2>
 			<div class="summary summary-stack">
-				<div class="result summary-card">
-					<div class="label">90% Dealer Payout</div>
-					<div class="value" id="payout90">$0.00</div>
-				</div>
-				<div class="result summary-card">
-					<div class="label">40% Dealer Payout</div>
-					<div class="value" id="payout40">$0.00</div>
-				</div>
-				<div class="result summary-card">
-					<div class="label">Total Silver Content</div>
-					<div class="value" id="sumOz">0.00 oz</div>
-				</div>
 				<div class="result summary-card final-summary-card">
 					<div class="label">Final Total Offer</div>
 					<div class="value" id="finalTotal">$0.00</div>
