@@ -345,22 +345,41 @@
 		}
 
 		
-		/* Show only Final Total in the on-screen Summary section */
-		.summary-stack > .summary-card:not(.final-summary-card) {
+		/* Final-only Summary display. Hidden JS values remain so calculator code keeps working. */
+		.hidden-js-values {
 			display: none !important;
 		}
 
-		.summary-stack {
+		.final-only-summary {
+			display: grid;
 			grid-template-columns: 1fr !important;
+			gap: 16px;
+			margin-bottom: 18px;
 		}
 
-		.final-summary-card .label {
-			display: none !important;
-		}
-
-		.final-summary-card {
-			min-height: 145px;
+		.final-only-summary .final-summary-card {
+			min-height: 150px;
+			padding: 28px;
+			border-radius: 24px;
 			justify-content: center;
+			align-items: flex-start;
+		}
+
+		.final-only-summary .final-summary-card .value {
+			font-size: 58px;
+			line-height: 1.05;
+			color: var(--accent);
+		}
+
+		@media(max-width:620px) {
+			.final-only-summary .final-summary-card {
+				min-height: 140px;
+				padding: 26px 22px;
+			}
+
+			.final-only-summary .final-summary-card .value {
+				font-size: 52px;
+			}
 		}
 
 		/* Large stacked Summary cards, matching the mobile screenshot layout */
@@ -412,6 +431,10 @@
 		@media(min-width:981px) {
 			.summary-stack {
 				grid-template-columns: repeat(4, 1fr);
+			}
+
+			.final-only-summary {
+				grid-template-columns: 1fr !important;
 			}
 
 			.summary-card {
@@ -870,21 +893,13 @@
 
 		<div class="card">
 			<h2>4) Summary</h2>
-			<div class="summary summary-stack">
-				<div class="result summary-card">
-					<div class="label">90% Dealer Payout</div>
-					<div class="value" id="payout90">$0.00</div>
-				</div>
-				<div class="result summary-card">
-					<div class="label">40% Dealer Payout</div>
-					<div class="value" id="payout40">$0.00</div>
-				</div>
-				<div class="result summary-card">
-					<div class="label">Total Silver Content</div>
-					<div class="value" id="sumOz">0.00 oz</div>
+			<div class="summary summary-stack final-only-summary">
+				<div class="hidden-js-values" aria-hidden="true">
+					<div id="payout90">$0.00</div>
+					<div id="payout40">$0.00</div>
+					<div id="sumOz">0.00 oz</div>
 				</div>
 				<div class="result summary-card final-summary-card">
-					<div class="label">Final Total Offer</div>
 					<div class="value" id="finalTotal">$0.00</div>
 				</div>
 			</div>
