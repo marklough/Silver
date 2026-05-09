@@ -344,6 +344,90 @@
 			}
 		}
 
+		/* Large stacked Summary cards, matching the mobile screenshot layout */
+		.summary-stack {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 16px;
+			margin-bottom: 18px;
+		}
+
+		.summary-card {
+			min-height: 130px;
+			padding: 26px 28px;
+			border-radius: 24px;
+			justify-content: center;
+		}
+
+		.summary-card .label {
+			font-size: 18px;
+			letter-spacing: .08em;
+			margin-bottom: 16px;
+		}
+
+		.summary-card .value {
+			font-size: 42px;
+			line-height: 1.05;
+		}
+
+		.final-summary-card {
+			background: var(--soft);
+			border-color: var(--accent);
+		}
+
+		.final-summary-card .value {
+			color: var(--accent);
+			font-size: 44px;
+		}
+
+		[data-theme="dark"] .summary-card {
+			background: #0f172a;
+			border-color: #334155;
+		}
+
+		[data-theme="dark"] .final-summary-card {
+			background: #1e3a5f;
+			border-color: #60a5fa;
+		}
+
+		@media(min-width:981px) {
+			.summary-stack {
+				grid-template-columns: repeat(4, 1fr);
+			}
+
+			.summary-card {
+				min-height: 118px;
+				padding: 18px;
+			}
+
+			.summary-card .label {
+				font-size: 13px;
+				margin-bottom: 10px;
+			}
+
+			.summary-card .value,
+			.final-summary-card .value {
+				font-size: 28px;
+			}
+		}
+
+		@media(max-width:620px) {
+			.summary-card {
+				min-height: 126px;
+				padding: 24px 22px;
+				border-radius: 22px;
+			}
+
+			.summary-card .label {
+				font-size: 17px;
+			}
+
+			.summary-card .value,
+			.final-summary-card .value {
+				font-size: 38px;
+			}
+		}
+
 		/* ── Breakdown Summary Panel ── */
 		.breakdown {
 			margin-top: 18px
@@ -767,20 +851,20 @@
 
 		<div class="card">
 			<h2>4) Summary</h2>
-			<div class="summary">
-				<div class="result">
+			<div class="summary summary-stack">
+				<div class="result summary-card">
 					<div class="label">90% Dealer Payout</div>
 					<div class="value" id="payout90">$0.00</div>
 				</div>
-				<div class="result">
+				<div class="result summary-card">
 					<div class="label">40% Dealer Payout</div>
 					<div class="value" id="payout40">$0.00</div>
 				</div>
-				<div class="result">
+				<div class="result summary-card">
 					<div class="label">Total Silver Content</div>
 					<div class="value" id="sumOz">0.00 oz</div>
 				</div>
-				<div class="result big">
+				<div class="result summary-card final-summary-card">
 					<div class="label">Final Total Offer</div>
 					<div class="value" id="finalTotal">$0.00</div>
 				</div>
