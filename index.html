@@ -1077,8 +1077,7 @@
 				// Stooq CSV examples can be either:
 				// Symbol,Date,Time,Open,High,Low,Close,Volume
 				// XAGUSD,2026-05-08,22:00:32,78.2860,81.5720,78.1350,80.6780,0
-				const lines = String(text).trim().split(/?
-/).filter(Boolean);
+				const lines = String(text).trim().split(/\r?\n/).filter(Boolean);
 				const last = lines[lines.length - 1] || '';
 				const cols = last.split(',');
 				const close = Number(cols[6]);
