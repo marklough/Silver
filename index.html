@@ -82,15 +82,13 @@
 			padding: 22px
 		}
 
-		h1 {
-			font-size: 34px;
+		h1 { font-size: 17pt;
 			line-height: 1.08;
 			margin: 0 0 8px;
 			letter-spacing: -.02em
 		}
 
-		h2 {
-			font-size: 24px;
+		h2 { font-size: 13pt;
 			margin: 0 0 14px;
 			letter-spacing: -.01em
 		}
@@ -341,30 +339,7 @@
 				padding: 14px
 			}
 
-			h1 {
-				font-size: 28px
-			}
-
-			.result .value {
-				font-size: 26px
-			}
-		}
-
-		@media(max-width:620px) {
-			.summary {
-				grid-template-columns: 1fr
-			}
-
-			body {
-				font-size: 18px
-			}
-
-			input {
-				font-size: 21px
-			}
-
-			.card {
-				padding: 16px;
+			h1 { font-size: 17pt;
 				border-radius: 18px
 			}
 		}
@@ -506,13 +481,13 @@
 		}
 
 		@media print {
-			@page { size: letter portrait; margin: 0.28in }
+			@page { size: letter portrait; margin: 0.32in }
 
 			body {
 				background: #fff;
 				color: #111827;
-				font-size: 9.3pt;
-				line-height: 1.1;
+				font-size: 10.2pt;
+				line-height: 1.16;
 				-webkit-print-color-adjust: exact;
 				print-color-adjust: exact
 			}
@@ -529,11 +504,11 @@
 				display: none !important
 			}
 
-			h1 { font-size: 13pt;
+			h1 { font-size: 17pt;
 				margin: 0 0 6pt
 			}
 
-			h2 { font-size: 10.5pt;
+			h2 { font-size: 13pt;
 				margin: 0 0 8pt
 			}
 
@@ -543,33 +518,33 @@
 
 			.print-title {
 				border-bottom: 2px solid #111827;
-				padding-bottom: 4pt;
-				margin-bottom: 5pt
+				padding-bottom: 6pt;
+				margin-bottom: 8pt
 			}
 
 			.print-meta {
-				font-size: 10.5pt;
+				font-size: 9.2pt;
 				color: #475569;
-				margin-top: 4pt
+				margin-top: 3pt
 			}
 
 			.print-grid {
 				display: grid;
 				grid-template-columns: repeat(4, 1fr);
-				gap: 4pt;
-				margin: 4pt 0 5pt
+				gap: 6pt;
+				margin: 8pt 0 9pt
 			}
 
 			.print-box {
 				border: 1.25px solid #94a3b8;
 				border-radius: 8pt;
-				padding: 4pt;
+				padding: 7pt;
 				background: #f8fafc;
 				break-inside: avoid
 			}
 
 			.print-box .k {
-				font-size: 9pt;
+				font-size: 8.2pt;
 				text-transform: uppercase;
 				letter-spacing: .04em;
 				color: #475569;
@@ -578,7 +553,7 @@
 			}
 
 			.print-box .v {
-				font-size: 15pt;
+				font-size: 14pt;
 				font-weight: 900;
 				color: #0f172a
 			}
@@ -589,15 +564,15 @@
 			}
 
 			.print-box.final .v {
-				font-size: 18pt;
+				font-size: 16pt;
 				color: #1d4ed8
 			}
 
 			.print-table {
 				width: 100%;
 				border-collapse: collapse;
-				margin-top: 8pt;
-				font-size: 8.4pt;
+				margin-top: 7pt;
+				font-size: 9.2pt;
 				page-break-inside: auto
 			}
 
@@ -606,16 +581,16 @@
 				color: #0f172a;
 				font-weight: 900;
 				text-transform: uppercase;
-				font-size: 7pt;
+				font-size: 7.8pt;
 				letter-spacing: .03em;
 				border: 1px solid #94a3b8;
-				padding: 2.8pt 3pt;
+				padding: 5pt 4pt;
 				text-align: right
 			}
 
 			.print-table td {
 				border: 1px solid #cbd5e1;
-				padding: 2.8pt 3pt;
+				padding: 5pt 4pt;
 				text-align: right;
 				vertical-align: top
 			}
@@ -628,7 +603,7 @@
 			.print-table .total-row td {
 				background: #f1f5f9;
 				font-weight: 900;
-				font-size: 8.2pt
+				font-size: 10pt
 			}
 
 			.print-notes {
@@ -690,6 +665,26 @@
 				color: #334155;
 				line-height: 1.12
 			}
+		}
+
+			/* Keep calculation method visible at bottom of exported PDF */
+			.print-notes {
+				display: block !important;
+				margin-top: 8pt !important;
+				border-top: 1.5px solid #000 !important;
+				padding-top: 6pt !important;
+				font-size: 8.6pt !important;
+				line-height: 1.18 !important;
+				color: #000 !important;
+				break-inside: avoid !important;
+				page-break-inside: avoid !important;
+			}
+
+			.print-notes div {
+				margin-bottom: 3pt !important;
+				color: #000 !important;
+			}
+
 		}
 
 		@media screen {
@@ -923,8 +918,8 @@
 				</div>
 			</div>
 			<div class="print-notes">
-				<div><strong>Silver content calculation method:</strong> 90% circulated coins use 0.715 troy oz ASW per $1 face value; 40% Kennedy halves use 0.295 troy oz ASW per $1 face value.</div>
-				<div><strong>Melt value method:</strong> Silver content × spot price = melt value. Dealer payout = melt value × buyback rate, or face value × editable $1 FV dealer payout.</div>
+				<div><strong>Silver content calculation method:</strong> 90% circulated coins = 0.715 troy oz ASW per $1 FV; 40% Kennedy halves = 0.295 troy oz ASW per $1 FV.</div>
+				<div><strong>Melt value method:</strong> silver content × spot price = melt value. Dealer payout = melt value × buyback rate, or face value × editable $1 FV dealer payout.</div>
 				<div><strong>Sterling ASW:</strong> Actual Silver Weight means pure silver content after the 92.5% sterling adjustment.</div>
 			</div>
 		</section>
