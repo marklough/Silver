@@ -713,7 +713,7 @@
 			<div class="grid">
 				<div class="span-3"><label for="spot">Silver Spot Price ($/oz)</label><input id="spot" type="number" step="0.01" value="80.00">
 					<div class="actions" style="margin-top:10px"><button type="button" onclick="fetchLiveSpot()">Fetch Live Spot</button></div>
-					<div class="help" id="spotStatus">Default is $80.00. Tap Fetch Live Spot to try multiple live sources, or edit manually.</div>
+					<div class="help" id="spotStatus">Default is $80.00. Tap Fetch Live Spot to try live XAG/USD; manual entry always works.</div>
 				</div>
 				<div class="span-3"><label for="fv90">Total 90% Face Value ($)</label><input id="fv90" type="number" step="0.01" value="100.00">
 					<div class="help">Populated from inventory PDF. Editable during use.</div>
@@ -869,7 +869,7 @@
 		<section class="print-report" id="printReport" aria-label="Printable dealer offer summary">
 			<div class="print-title">
 				<h1>Silver Collection Dealer Offer Summary</h1>
-				<div class="print-meta">Printable summary generated from editable calculator inputs. Inventory defaults came from the uploaded inventory PDF. Spot is editable; live fetch uses fallback public sources when the browser permits it.</div>
+				<div class="print-meta">Printable summary generated from editable calculator inputs. Inventory defaults came from the uploaded inventory PDF. Spot is editable; live fetch uses public XAG/USD sources when the browser allows it.</div>
 			</div>
 			<div class="print-grid">
 				<div class="print-box">
@@ -1044,73 +1044,54 @@
 		}
 
 
-		function parseSpotFromPayload(payload) {
-			let spotValue = null;
-
-			if (typeof payload === 'string') {
-				const text = payload.trim();
-
-				// Stooq CSV shape: Symbol,Date,Time,Open,High,Low,Close,Volume
-				if (text.includes('Symbol') && text.includes('Close')) {
-					const lines = text.split(/\r?\n/).filter(Boolean);
-					if (lines.length >= 2) {
-						const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-						const cells = lines[1].split(',').map(c => c.trim());
-						const closeIndex = headers.indexOf('close');
-						if (closeIndex >= 0) spotValue = parseFloat(cells[closeIndex]);
-					}
-				}
-
-				if (!spotValue) {
-					try {
-						payload = JSON.parse(text);
-					} catch (_) {
-						return null;
-					}
+		function extractSpotValue(data) {
+			let candidates = [];
+			function walk(obj) {
+				if (obj == null) return;
+				if (typeof obj === 'number' && isFinite(obj)) { candidates.push(obj); return; }
+				if (Array.isArray(obj)) { obj.forEach(walk); return; }
+				if (typeof obj === 'object') {
+					['price','silver','XAG','xag','ask','bid','mid','value','rate'].forEach(k => {
+						if (typeof obj[k] === 'number' && isFinite(obj[k])) candidates.push(obj[k]);
+					});
+					Object.keys(obj).forEach(k => { if (typeof obj[k] === 'object') walk(obj[k]); });
 				}
 			}
-
-			if (Array.isArray(payload)) {
-				for (const item of payload) {
-					if (item && typeof item.silver === 'number') spotValue = item.silver;
-					if (item && typeof item.price === 'number') spotValue = item.price;
-					if (item && typeof item.close === 'number') spotValue = item.close;
-				}
-			} else if (payload && typeof payload === 'object') {
-				if (typeof payload.silver === 'number') spotValue = payload.silver;
-				if (typeof payload.price === 'number') spotValue = payload.price;
-				if (typeof payload.close === 'number') spotValue = payload.close;
-				if (payload.rates && typeof payload.rates.XAG === 'number') spotValue = payload.rates.XAG;
-			}
-
-			return spotValue && isFinite(spotValue) ? spotValue : null;
+			walk(data);
+			// Silver spot should normally be quoted in dollars per troy ounce, not fractions or huge currency ratios.
+			candidates = candidates.filter(n => n > 1 && n < 300);
+			return candidates.length ? candidates[0] : null;
 		}
 
-		async function tryFetchSpot(url, type) {
-			const response = await fetch(url, { cache: 'no-store' });
-			if (!response.ok) throw new Error('Bad response from ' + url);
-			return type === 'text' ? response.text() : response.json();
+		async function fetchJsonWithTimeout(url, timeoutMs = 9000) {
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), timeoutMs);
+			try {
+				const response = await fetch(url, { cache: 'no-store', signal: controller.signal, mode: 'cors' });
+				if (!response.ok) throw new Error('HTTP ' + response.status);
+				return await response.json();
+			} finally {
+				clearTimeout(timer);
+			}
 		}
 
 		async function fetchLiveSpot() {
 			const status = $('spotStatus');
 			status.textContent = 'Fetching live silver spot...';
 
-			const stooqUrl = 'https://stooq.com/q/l/?s=xagusd&f=sd2t2ohlcv&h&e=csv';
 			const sources = [
-				{ name: 'Metals.live direct', url: 'https://api.metals.live/v1/spot/silver', type: 'json' },
-				{ name: 'Metals.live through AllOrigins', url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.metals.live/v1/spot/silver'), type: 'text' },
-				{ name: 'Stooq XAG/USD through AllOrigins', url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(stooqUrl), type: 'text' }
+				{ name: 'Gold-API XAG', url: 'https://api.gold-api.com/price/XAG' },
+				{ name: 'Gold-API Silver alias', url: 'https://api.gold-api.com/price/SILVER' },
+				{ name: 'Metals.live', url: 'https://api.metals.live/v1/spot/silver' }
 			];
 
-			let lastError = null;
+			let lastError = '';
 			for (const source of sources) {
 				try {
 					status.textContent = 'Trying ' + source.name + '...';
-					const payload = await tryFetchSpot(source.url, source.type);
-					const spotValue = parseSpotFromPayload(payload);
-					if (!spotValue) throw new Error('No silver spot value found from ' + source.name);
-
+					const data = await fetchJsonWithTimeout(source.url);
+					const spotValue = extractSpotValue(data);
+					if (!spotValue || !isFinite(spotValue)) throw new Error('No usable silver price in response');
 					setVal('spot', spotValue, 2);
 					editingPayout = null;
 					editingSterlingPayout = false;
@@ -1118,18 +1099,17 @@
 					status.textContent = 'Live spot updated from ' + source.name + ': ' + money(spotValue) + ' per oz. You can still edit it manually.';
 					return;
 				} catch (err) {
-					lastError = err;
-					console.warn(source.name + ' failed:', err);
+					lastError = source.name + ': ' + (err && err.message ? err.message : String(err));
+					console.warn('Live spot source failed:', source.name, err);
 				}
 			}
 
-			status.textContent = 'Live fetch failed in this browser. Enter spot manually. Some iPhone/file browsers block live web requests from local HTML files.';
-			console.error(lastError);
+			status.textContent = 'Live fetch failed from all built-in sources. Your GitHub Pages page is working, but the price API may be blocked/down. Enter spot manually for now. Last error: ' + lastError;
 		}
 
 		function resetDefaults() {
 			Object.entries(DEFAULTS).forEach(([k, v]) => { setVal(k, v, k.includes('rate') ? 1 : 2) });
-			$('spotStatus').textContent = 'Reset to default spot of $80.00. Tap Fetch Live Spot to try multiple live sources, or edit manually.';
+			$('spotStatus').textContent = 'Reset to default spot of $80.00. Tap Fetch Live Spot to try live XAG/USD.';
 			editingPayout = null;
 			editingSterlingPayout = false;
 			calc();
