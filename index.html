@@ -82,13 +82,15 @@
 			padding: 22px
 		}
 
-		h1 { font-size: 17pt;
+		h1 {
+			font-size: 17pt;
 			line-height: 1.08;
 			margin: 0 0 8px;
 			letter-spacing: -.02em
 		}
 
-		h2 { font-size: 13pt;
+		h2 {
+			font-size: 13pt;
 			margin: 0 0 14px;
 			letter-spacing: -.01em
 		}
@@ -339,12 +341,13 @@
 				padding: 14px
 			}
 
-			h1 { font-size: 17pt;
+			h1 {
+				font-size: 17pt;
 				border-radius: 18px
 			}
 		}
 
-		
+
 		/* Final-only Summary display. Hidden JS values remain so calculator code keeps working. */
 		.hidden-js-values {
 			display: none !important;
@@ -607,7 +610,10 @@
 		}
 
 		@media print {
-			@page { size: letter portrait; margin: 0.32in }
+			@page {
+				size: letter portrait;
+				margin: 0.32in
+			}
 
 			body {
 				background: #fff;
@@ -630,11 +636,13 @@
 				display: none !important
 			}
 
-			h1 { font-size: 17pt;
+			h1 {
+				font-size: 17pt;
 				margin: 0 0 6pt
 			}
 
-			h2 { font-size: 13pt;
+			h2 {
+				font-size: 13pt;
 				margin: 0 0 8pt
 			}
 
@@ -793,23 +801,23 @@
 			}
 		}
 
-			/* Keep calculation method visible at bottom of exported PDF */
-			.print-notes {
-				display: block !important;
-				margin-top: 8pt !important;
-				border-top: 1.5px solid #000 !important;
-				padding-top: 6pt !important;
-				font-size: 8.6pt !important;
-				line-height: 1.18 !important;
-				color: #000 !important;
-				break-inside: avoid !important;
-				page-break-inside: avoid !important;
-			}
+		/* Keep calculation method visible at bottom of exported PDF */
+		.print-notes {
+			display: block !important;
+			margin-top: 8pt !important;
+			border-top: 1.5px solid #000 !important;
+			padding-top: 6pt !important;
+			font-size: 8.6pt !important;
+			line-height: 1.18 !important;
+			color: #000 !important;
+			break-inside: avoid !important;
+			page-break-inside: avoid !important;
+		}
 
-			.print-notes div {
-				margin-bottom: 3pt !important;
-				color: #000 !important;
-			}
+		.print-notes div {
+			margin-bottom: 3pt !important;
+			color: #000 !important;
+		}
 
 		}
 
@@ -1199,10 +1207,10 @@
 					}
 				}
 				if (data && typeof data === 'object') {
+					if (typeof data.bid === 'number') return data.bid;
 					if (typeof data.price === 'number') return data.price;
 					if (typeof data.silver === 'number') return data.silver;
 					if (typeof data.ask === 'number') return data.ask;
-					if (typeof data.bid === 'number') return data.bid;
 					if (data.rates && typeof data.rates.XAG === 'number') return data.rates.XAG;
 				}
 				return null;
@@ -1212,8 +1220,7 @@
 			var metalsLiveUrl = 'https://api.metals.live/v1/spot/silver';
 			var goldApiUrl = 'https://api.gold-api.com/price/XAG';
 
-			var sources = [
-				{
+			var sources = [{
 					name: 'Stooq XAG/USD',
 					url: stooqUrl,
 					type: 'csv'
@@ -1280,8 +1287,7 @@
 				'<div style="margin-top:8px;font-size:13px;line-height:1.35">Details: ' + errors.join(' | ') + '</div>';
 		}
 
-		function resetDefaults()
- {
+		function resetDefaults() {
 			Object.entries(DEFAULTS).forEach(([k, v]) => { setVal(k, v, k.includes('rate') ? 1 : 2) });
 			$('spotStatus').textContent = 'Reset to default spot of $80.00. Tap Fetch Live Spot to update, or enter spot manually.';
 			editingPayout = null;
@@ -1289,16 +1295,26 @@
 			calc();
 		}
 		['buyPerFv90', 'buyPerFv40'].forEach(id => {
-			$(id).addEventListener('input', () => { editingPayout = id === 'buyPerFv90' ? '90' : '40';
-				calc(); });
+			$(id).addEventListener('input', () => {
+				editingPayout = id === 'buyPerFv90' ? '90' : '40';
+				calc();
+			});
 			$(id).addEventListener('blur', () => { setVal(id, val(id), 2); });
 		});
-		['rate90', 'rate40', 'spot'].forEach(id => $(id).addEventListener('input', () => { editingPayout = null;
+		['rate90', 'rate40', 'spot'].forEach(id => $(id).addEventListener('input', () => {
+			editingPayout = null;
 			editingSterlingPayout = false;
-			calc(); }));
+			calc();
+		}));
 		['fv90', 'fv40', 'numismatic'].forEach(id => $(id).addEventListener('input', calc));
-		['sterlingSilverOz', 'rateSterling'].forEach(id => $(id).addEventListener('input', () => { editingSterlingPayout = false; calc(); }));
-		$('sterlingPayout').addEventListener('input', () => { editingSterlingPayout = true; calc(); });
+		['sterlingSilverOz', 'rateSterling'].forEach(id => $(id).addEventListener('input', () => {
+			editingSterlingPayout = false;
+			calc();
+		}));
+		$('sterlingPayout').addEventListener('input', () => {
+			editingSterlingPayout = true;
+			calc();
+		});
 		$('sterlingPayout').addEventListener('blur', () => { setVal('sterlingPayout', val('sterlingPayout'), 2); });
 		// Dark mode
 		function applyTheme(dark) {
