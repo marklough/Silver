@@ -1201,12 +1201,15 @@
 				if (Array.isArray(data)) {
 					for (i = 0; i < data.length; i++) {
 						item = data[i];
+						// Prefer bid over mid/last price where available
+						if (item && typeof item.bid === 'number') return item.bid;
 						if (item && typeof item.silver === 'number') return item.silver;
 						if (item && typeof item.price === 'number') return item.price;
 						if (item && typeof item.close === 'number') return item.close;
 					}
 				}
 				if (data && typeof data === 'object') {
+					// Prefer bid over mid/last price where available
 					if (typeof data.bid === 'number') return data.bid;
 					if (typeof data.price === 'number') return data.price;
 					if (typeof data.silver === 'number') return data.silver;
@@ -1221,29 +1224,34 @@
 			var goldApiUrl = 'https://api.gold-api.com/price/XAG';
 
 			var sources = [{
+					name: 'Gold-API XAG',
+					url: goldApiUrl,
+					type: 'json',
+					priceType: 'bid'
+				},
+				{
 					name: 'Stooq XAG/USD',
 					url: stooqUrl,
-					type: 'csv'
+					type: 'csv',
+					priceType: 'last close'
 				},
 				{
 					name: 'AllOrigins Stooq fallback',
 					url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(stooqUrl),
-					type: 'csv'
-				},
-				{
-					name: 'Gold-API XAG',
-					url: goldApiUrl,
-					type: 'json'
+					type: 'csv',
+					priceType: 'last close'
 				},
 				{
 					name: 'Metals.live',
 					url: metalsLiveUrl,
-					type: 'json'
+					type: 'json',
+					priceType: 'midpoint'
 				},
 				{
 					name: 'AllOrigins Metals.live fallback',
 					url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(metalsLiveUrl),
-					type: 'json'
+					type: 'json',
+					priceType: 'midpoint'
 				}
 			];
 
@@ -1271,7 +1279,7 @@
 					editingPayout = null;
 					editingSterlingPayout = false;
 					calc();
-					status.innerHTML = 'Live spot updated from ' + source.name + ': <strong>' + money(spotValue) + '</strong> per oz. You can still edit it manually.';
+					status.innerHTML = 'Live spot updated from ' + source.name + ' (' + source.priceType + '): <strong>' + money(spotValue) + '</strong> per oz. You can still edit it manually.';
 					return;
 				} catch (err) {
 					errors.push(source.name + ': ' + (err && err.name === 'AbortError' ? 'timed out' : (err && err.message ? err.message : String(err))));
