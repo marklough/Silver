@@ -843,6 +843,7 @@
 				<div class="span-3"><label for="spot">Silver Spot Price ($/oz)</label><input id="spot" type="number" step="0.01" value="80.00">
 					<div class="actions" style="margin-top:10px"><button type="button" onclick="fetchLiveSpot()">Fetch Live Spot</button></div>
 					<div class="help" id="spotStatus">Default is $80.00. Tap Fetch Live Spot to update, or enter spot manually.</div>
+					<div class="help" id="spotPriceType" style="margin-top:4px"></div>
 				</div>
 				<div class="span-3"><label for="fv90">Total 90% Face Value ($)</label><input id="fv90" type="number" step="0.01" value="100.00">
 					<div class="help">Populated from inventory PDF. Editable during use.</div>
@@ -1279,7 +1280,8 @@
 					editingPayout = null;
 					editingSterlingPayout = false;
 					calc();
-					status.innerHTML = 'Live spot updated from ' + source.name + ' (' + source.priceType + '): <strong>' + money(spotValue) + '</strong> per oz. You can still edit it manually.';
+					status.innerHTML = 'Live spot updated from ' + source.name + ': <strong>' + money(spotValue) + '</strong> per oz. You can still edit it manually.';
+					$('spotPriceType').innerHTML = 'Price type: <strong>' + source.priceType + '</strong>';
 					return;
 				} catch (err) {
 					errors.push(source.name + ': ' + (err && err.name === 'AbortError' ? 'timed out' : (err && err.message ? err.message : String(err))));
